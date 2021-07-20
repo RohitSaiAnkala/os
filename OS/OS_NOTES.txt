@@ -1,0 +1,245 @@
+Cheat Sheet for OS: https://whimsical.com/operating-system-cheatsheet-by-love-babbar-S9tuWBCSQfzoBRF5EDNinQ
+Introduction to Operating Systems:
+An OS acts as an interface between hardware and user.
+
+--------------------------------------------------
+
+-------------------User---------------------------
+
+-------------Applications(Chrome,Word)-------------
+
+---------------OS(Windows,Linux)-------------------
+
+-------------Hardware(CPU,HDD,Memory)--------------
+
+---------------------------------------------------
+
+Need of OS/Services provided by OS:
+1. Abstraction : If we want to directly interact with hardware we should write program(assembly level) each time which is tedious. So OS gives us the basic
+services such as reading/writing files from/to hard-disk , displaying on monitor, moving mouse etc.
+2. Resource-Management: If multiple processes request for CPU which process to give priority,  we want OS (resource-manager) to decide which process to be given CPU(loaded onto RAM)
+3. Protection: When multiple applications are running, one application should not affect other application or CPU
+
+Examples : Desktop: Windows, Linux , MacOS etc Mobile: Android, IOS
+
+
+Whenever u want to run anything first the file/app should be brought on to the memory and then only CPU can execute it.
+Types of OS:
+1. SingleTasking -- only 1 core in cpu and allow only 1 process to be in the RAM and running at time.
+Eg: MS-DOS. They are inefficient because there is single CPU and when IO operations take place the CPU is idle.
+
+2. Multiprogramming and Multitasking : single cpu, but multiple-process can be run concurrently. when one process is doing IO another process can use CPU.
+	Multitasking is where fixed number of time is alloted for each process.
+3. MultiThreading : multiple threads run in a process in an interleaved fashion
+4. Multiprocessing : multiple processors share the process/threads
+
+MultiThreading
+. Multitasking vs MultiThreading
+   .Multitasking: Listening music and browse web
+   .MultiThreading: downloading something in browser and browsing (both are in single process but multiple threads)
+. Real Word Examples
+  .WordProcessors(MS Word): Typing,saving, formatting and spell check happen at the same time
+  . IDE's : Modern IDE's show compile errors when you write the code
+Advantages:
+. Parallelism and Improved Performance
+. Responsiveness (one thread can take care of browsing another thread can do download operation  etc)
+. Better Resource Utilisation (All threads share the same memory)
+DisAdvantages:
+. It is difficult to write, test and debug codes. (Different times u run u get different output)
+. Can lead to deadlock and race conditions.
+  Race Condition :  assume x=5
+	Thread 1			Thread 2
+	read x
+	x++
+	write x
+						read x
+						x++
+						write x
+	Now x=7 finally after 2 threads are executed and it is as expected
+
+	assume x=5
+	Thread 1			Thread 2
+	read x
+	x++
+						read x
+						x++
+	write x				write x
+	Now x=6 finally after 2 threads are executed and it is not expected (as we want 7)
+
+	Deadlock(Threads):
+			 R1
+	       /   \
+		   T1   T2
+		   \    /
+		     R2
+
+    T1 holds R1 and waits for R2 and T2 holds R2 and waits for R1 so none of them can proceed further
+
+Process vs Thread:
+
+Process : A program in execution is called process. A process can have 1 or more threads.
+Thread  : smallest unit of program
+	T1 				T2			T3
+	stack    		stack 		stack
+	.....
+
+	.....
+	heap(dynamically allocated memory)
+	data segment  (static/global variables)
+	code segment (binary code)
+
+.Each process has a function stack(thread) , heap memory, data segment and code segment
+.Thread T1(main thread) shares same heap,data ,code with other threads(T2,T3) but they have their own function call stack.
+
+.Threads are lightweight(easy to create and terminate them)
+.Multiple threads in a process share the same address space , easier to communicate, context switching is easier
+
+Process Control Block : central Data structure used by all modules of OS
+ . Process Id, Process state, CPU Register,Accounts info,cpu scheduling info, memory info
+
+Scheduler:
+Long Term Scheduler : Brings process from harddisk to RAM(new to ready state). It also ensures a mix of IO bound(IO most of the time) and CPU bound(use CPU most of the time) processes.
+Short Term Scheduler: Moves process from ready to running state and also calls dispatcher (process control switch)
+Medium Term Scheduler: Moves process from waiting state to suspend block state and ready state to suspend ready state
+
+ReadyQueue: All the ready processes are kept in a ready queue
+JobQueue: All the jobs waiting to go to RAM and become process
+IOQueue: Multiple IO devices have their own queue
+
+
+Background for Scheduling Algorithms
+When is a process picked by scheduler
+. When some other process moves from running to waiting or running to ready
+. When a new/existing process moves to a ready state
+. When a process terminates
+Different times in scheduling algorithms
+||| P0   |  P1 | P0 |
+0 1      3     5    6
+For P0
+Arrival Time: 1 (Time when P0 arrives)
+Completion Time: 6 (Time when P0 completes)
+Burst Time: 3(((3-1)+(6-5)->2+1=3) (Time for which P0 gets the CPU)
+TurnAround Time: 5 (6-1=5)(Difference between completion and arrival time -->Completion Time - Arrival Time)
+Waiting Time: 2 (5-3)(Time spent by a process in a ready queue) (Turn around time - Burst Time)
+Response Time: 0 (1-1)(Difference between arrival time and first time the process gets the CPU) (In this case arrived at 1 got the cpu at 1 for PO)
+Goals of  Scheduling algorithm
+. Max CPU Utilisation -- CPU is to be used max
+. Max throughput -- no of jobs finished per unit of time. (Eg: if cpu is finishing 10 jobs per sec then throughput is 10)
+. Min TurnAround time -- duration b/w arrival and completion should be min
+. Min Waiting time -- duration the process waits in the ready queue should be min
+. Min Response time -- duration b/w arrival and first cpu allocation time should be min
+. Fair CPU Allocation (No starvation) -- one job is not picked from so much time
+We consider the average of the above to be min/max i.e average throughput should be high, average turnAround time should be less etc
+
+FCFS Scheduling Algorithm (Non-Premptive)
+Process   Arrival Time    Burst Time  Completion Time   Turn Around Time    Waiting Time
+P0          0               2           2                 2                    0
+P1          1               6           8                 7                    1
+P2          2               4           12                10                   6
+P3          3               9           21                18                   9
+P4          4               12          33                29                   17
+| P0  |    P1  |  P2 |    P3     |         P4        |
+0     2        8     12         21                   33
+Completion Time,TurnAround Time and Waiting Time are calculated and filled above.
+FCFS
+.Simple and Easy to Implement
+.Non Premptive
+.Convoy Effect
+.Avg Waiting Time
+
+SJF(Shortest Job First)(Non-Premptive)
+Process 	Arrival Time 	Burst Time  Completion Time  Turn Around Time	Waiting Time
+P0 				0				5			5				5                  0
+P1				1				4			12				11                 7
+P2				2				3			8 				6                  3
+P3				3				8			20				17                 9
+
+0    5   8    12  20
+ P0    P2   P1   P3
+
+ Process    Completion Time
+  P0		  5
+  P1		  12
+  P2		  8
+  P3		  20
+
+-----------TO be filled from SRTF /SJF Premptive Video-----------------------------
+
+Priority scheduling (Non-Premptive)
+Process   Arrival Time  Priority  Burst Time    Completion Time       TurnAround Time      Waiting Time
+P0             0          5           3           3                       3                  0
+P1             1          3           5           22                      21                 16
+P2             2          15          8           11                      9                  1
+P3             3          12          6           17                      14                 8
+P2 has highest priority (as per high priority (priority can be defined in anyway low, high, userdefined))
+0    3             11          17         22
+  P0        P2           P3          P1
+Note: Completion Time,TurnAround Time and Waiting Time are calculated and not given
+Priority Scheduling (Premptive)
+Process       Arrival time      Priority     Burst Time    Completion time    TurnAround time     Waiting Time
+P0              0                 5             3             17                17                  14
+P1              1                 3             5             22                21                  16
+P2              2                 15            8             10                8                   0
+P3              3                 12            6             16                13                  7
+0    2          10          16    17      22
+  P0      P2          P3       P0      P1
+Priority Scheduling faces starvation of low priority process. It means if a low priority process is there in ready queue and high priority process keeps on coming
+then the low priority process does not get the CPU.
+To avoid starvation we have aging technique
+  Aging : Increase the priority  of process as per its age(waiting time) in ready queue
+
+Round Robin Scheduling
+. Time Quantum : Every process runs for a fixed time quantum (eg: 2 sec if the process burst time is <2sec i.e 1sec then it will run for 1 sec only)
+. Circular Queue: All the processes are kept in circular ready queue
+. Avg Waiting Time is higher but good response time
+. Sensitive to Time Quantum -->Smaller: Context Switch Overhead , Longer: Becomes FCFS
+
+Process       Arrival time    Burst time  Completion time   TurnAround time   Waiting Time    Response Time
+P0               0               3           6                  6               3                0
+P1               1               1           3                  2               1                1
+P2               1               5           9                  8               3                2
+
+
+0    2   3    5  6    9
+  P0   P1  P2  P0  P2
+
+MultiLevel Queue scheduling
+. Use different queues for different set of processes and apply different scheduling algorithms for different queues (multiple ready queues)
+Eg:
+Q1  --> Round Robin
+Q2  --> FCFS
+Q3  --> SJF
+
+And all the above queues are run in round robin fashion.
+
+MultiLevel Queue with Feedback algorithm
+ . It is used in most of the Operating Systems.
+ . It is most flexible and complex scheduling algorithm.
+ . A process can be moved from one queue to other.
+
+ Process Synchronisation
+ . Inter-Process Communication:
+   .When one process needs to communicate with other process.
+   .The processes use shared-memory i.e global variables for communication
+   .Race condition occurs (before a value is written to memory by process due to premption another process may read the wrong value)
+    Eg: let us consider x=2 as global variable
+      fun1(){                                      fun2(){
+     Line1  if(x==2)                                   x++;
+     Line2  y=x+5;                                    }
+    }
+    let us assume the fun1() is prempted after line 1 and fun2() is executed then x value becomes 3 in fun2 and y becomes 8 in fun1() but y should have become 7.
+    So there is inconsistency in data.
+  Line2 is critical section in fun1() and line 1 is critical section in fun2()
+	So only 1 process should be in critical section to avoid race condition. If all process only do the read operation then there is no problem of race condition.
+
+Goals of Synchronisation Mechanisms
+. Mutual Exclusion : only 1 process is allowed to enter critical section
+. Progress : Any process which does not have critical section should not block other processes which have critical section
+. Bounded Waiting (Fair) :  Any process should not be waiting forever to go to critical section there should be a time bound for entering/exiting critical section
+. Performance
+
+Overview of Synchronisation Mechanisms
+. Disabling Interrupts : Not allowing interruption/premption during critical section to avoid race conditions
+. Locks (or Mutex) : acquire lock when going to critical section and disable lock after you come out of critical section
+. Semaphores : Wait and signal operations . wait-->to enter into a critical section , signal --> to release from a critical section
+. Monitors : put shared global variables in class and all the methods which update those variables also in the same class. Java uses synchronised keyword for this purpose.
