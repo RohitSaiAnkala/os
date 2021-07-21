@@ -243,3 +243,52 @@ Overview of Synchronisation Mechanisms
 . Locks (or Mutex) : acquire lock when going to critical section and disable lock after you come out of critical section
 . Semaphores : Wait and signal operations . wait-->to enter into a critical section , signal --> to release from a critical section
 . Monitors : put shared global variables in class and all the methods which update those variables also in the same class. Java uses synchronised keyword for this purpose.
+
+Locks for Synchronisation :
+. Software Locks
+. Hardware Locks : TSL Lock (hardware locks are generally used)
+
+  void deposit(int x){																					void withdraw(int x){
+	  while(test_and_set(lock)){;}															    while(test_and_set(lock)){;}
+	  amount=amount+x;																					      amount=amount-x;
+	  lock=false;																							    lock=false;
+	}
+												bool test_and_set(bool * ptr){
+													bool old=*ptr;
+													*ptr=true;
+													return old;
+												}
+. The above code is hardware logic and it avoids race condition and ensures only 1 process is there in critical section.
+
+Semaphore:
+DisAdvantages of lock:
+. Lock based solution waits for the lock to be false so it runs a loop
+. 1 process can again use the critical section discarding other processes
+. no bounded waiting time in lock
+.
+struct Semaphore{
+int count;
+Queue q;
+}
+
+.We can correlate semaphore with  a security guard near restrooms(resources).
+. Initially let us assume there are p1,p2,p3,p4,p5,p6 persons and three restrooms R1,R2,R3
+		R1 				R2				R3
+		P1				P2				P3
+					Security Guard 								P4,P5,P6
+	initially count=3(no of resources),so after P1,P2,P3 come then count decrements to zero and when P4 comes the wait() is called and count is reduced to -1
+	and the security guard tells him to sleep by taking his phone number and adding it into queue, incase of process the Process control block(Address)	is added
+	to the queue. Similarly when P5 comes the count is reduced to -2 and queue: P4,P5
+	Now lets assume P2 releases by calling signal() and count becomes -1 and P4 is removed from queue and assigned R2.
+
+	So here security guard acts like a semaphore by asking the process to sleep/not bother and semaphore wakes them up by signal().
+
+ void wait(){																																	void signal(){
+ s.count--;																																			s.count++;
+ if(s.count<0){																																	if(s.count<=0){
+ 	1. add the call process to q																									  1. Remove a process P from q.
+	2. sleep(p)																																	    2. wakeup(p)
+ }
+ 
+
+ 																						}
